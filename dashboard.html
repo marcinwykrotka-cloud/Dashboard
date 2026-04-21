@@ -15,6 +15,21 @@ body { font-family: sans-serif; background: var(--cream); padding: 20px; color: 
 .bar-wrap { background: #f0ebfb; height: 25px; border-radius: 5px; overflow: hidden; position: relative; }
 .bar-fill { height: 100%; background: var(--violet); transition: width 0.8s; }
 .bar-lbl { font-size: 12px; margin-bottom: 5px; font-weight: bold; }
+
+/* Styl przycisku usuwania */
+.btn-danger { 
+    background: #c0392b; 
+    color: white; 
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-size: 12px; 
+    margin-top: 20px; 
+    font-weight: bold; 
+    transition: background 0.3s;
+}
+.btn-danger:hover { background: #a93226; }
 </style>
 </head>
 <body>
@@ -27,22 +42,34 @@ body { font-family: sans-serif; background: var(--cream); padding: 20px; color: 
             <div class="stat"><div class="lbl">Śr. Stereotypów</div><div class="val" id="avg-myths">0</div></div>
         </div>
         <div id="gen-stats"></div>
+        
+        <button class="btn-danger" onclick="clearResults()">Wyczyść wszystkie wyniki</button>
     </div>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script>
 const firebaseConfig = { databaseURL: "https://kompas-hr-default-rtdb.europe-west1.firebasedatabase.app" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
 db.ref('wyniki').on('value', (snapshot) => {
     const data = snapshot.val();
-    if (!data) return;
+    if (!data) {
+        document.getElementById('count').innerText = 0;
+        document.getElementById('avg-flex').innerText = '0%';
+        document.getElementById('avg-myths').innerText = 0;
+        document.getElementById('gen-stats').innerHTML = '';
+        document.getElementById('status').innerText = "Baza danych jest pusta.";
+        return;
+    }
     const arr = Object.values(data);
     const n = arr.length;
     document.getElementById('count').innerText = n;
     document.getElementById('avg-flex').innerText = Math.round(arr.reduce((s,r)=>s+r.flex,0)/n) + '%';
     document.getElementById('avg-myths').innerText = (arr.reduce((s,r)=>s+r.myths,0)/n).toFixed(1);
     document.getElementById('status').innerText = "✓ Połączenie aktywne | Ostatnia aktualizacja: " + new Date().toLocaleTimeString();
+    
     let genHtml = '';
     const gens = [{k:'BB', n:'Baby Boomers'}, {k:'X', n:'Gen X'}, {k:'Y', n:'Millenialsi'}, {k:'Z', n:'Gen Z'}];
     gens.forEach(g => {
@@ -52,6 +79,18 @@ db.ref('wyniki').on('value', (snapshot) => {
     });
     document.getElementById('gen-stats').innerHTML = genHtml;
 });
+
+// Funkcja usuwania danych
+async function clearResults() {
+    if (confirm("Czy na pewno chcesz trwale usunąć wszystkie wyniki z bazy danych? Tej operacji nie można cofnąć.")) {
+        try {
+            await db.ref('wyniki').remove();
+            alert("Baza danych została wyczyszczona.");
+        } catch (e) {
+            alert("Wystąpił błąd podczas usuwania danych: " + e.message);
+        }
+    }
+}
 </script>
 </body>
 </html>
