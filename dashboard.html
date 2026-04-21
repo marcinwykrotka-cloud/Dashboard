@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="pl"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1">&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1">&lt;title&gt;Dashboard Grupy – LIVE&lt;/title&gt;</p>
+<p class="p1">&lt;style&gt;</p>
+<p class="p1">:root { --plum: #2D1B4E; --violet: #5B2D8E; --gold: #D4A843; --cream: #FAF7F2; --white: #ffffff; }</p>
+<p class="p1">body { font-family: sans-serif; background: var(--cream); padding: 20px; color: #222; }</p>
+<p class="p1">.dash-card { background: var(--white); border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); padding: 25px; max-width: 800px; margin: 0 auto 20px; }</p>
+<p class="p1">.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }</p>
+<p class="p1">.stat { text-align: center; padding: 20px; border: 1.5px solid #e0d8f0; border-radius: 10px; }</p>
+<p class="p1">.stat .val { font-size: 36px; font-weight: bold; color: var(--plum); }</p>
+<p class="p1">.stat .lbl { font-size: 10px; text-transform: uppercase; color: #666; }</p>
+<p class="p1">.bar-row { margin-bottom: 15px; text-align: left; }</p>
+<p class="p1">.bar-wrap { background: #f0ebfb; height: 25px; border-radius: 5px; overflow: hidden; position: relative; }</p>
+<p class="p1">.bar-fill { height: 100%; background: var(--violet); transition: width 0.8s; }</p>
+<p class="p1">.bar-lbl { font-size: 12px; margin-bottom: 5px; font-weight: bold; }</p>
+<p class="p1">&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="dash-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 style="font-family: Georgia; color: var(--plum); margin-bottom: 20px;"&gt;Wyniki grupy w czasie rzeczywistym&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="status" style="font-size: 12px; color: green; margin-bottom: 10px;"&gt;Łączenie z bazą...&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="stat"&gt;&lt;div class="lbl"&gt;Uczestników&lt;/div&gt;&lt;div class="val" id="count"&gt;0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="stat"&gt;&lt;div class="lbl"&gt;Śr. Elastyczność&lt;/div&gt;&lt;div class="val" id="avg-flex"&gt;0%&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="stat"&gt;&lt;div class="lbl"&gt;Śr. Stereotypów&lt;/div&gt;&lt;div class="val" id="avg-myths"&gt;0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="gen-stats"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">const firebaseConfig = { databaseURL: "TU_WKLEJ_SWOJ_URL_Z_FIREBASE" };</p>
+<p class="p1">firebase.initializeApp(firebaseConfig);</p>
+<p class="p1">const db = firebase.database();</p>
+<p class="p2"><br></p>
+<p class="p1">db.ref('wyniki').on('value', (snapshot) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const data = snapshot.val();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!data) return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const arr = Object.values(data);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const n = arr.length;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('count').innerText = n;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('avg-flex').innerText = Math.round(arr.reduce((s,r)=&gt;s+r.flex,0)/n) + '%';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('avg-myths').innerText = (arr.reduce((s,r)=&gt;s+r.myths,0)/n).toFixed(1);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('status').innerText = "✓ Aktywny | Ostatni wynik: " + new Date().toLocaleTimeString();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let genHtml = '';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const gens = [{k:'BB', n:'Baby Boomers'}, {k:'X', n:'Gen X'}, {k:'Y', n:'Millenialsi'}, {k:'Z', n:'Gen Z'}];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>gens.forEach(g =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const avg = (arr.reduce((s,r)=&gt;s+r[g.k],0)/n).toFixed(1);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const pct = (avg / 7.5) * 100;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>genHtml += `&lt;div class="bar-row"&gt;&lt;div class="bar-lbl"&gt;${g.n} (${avg} pkt)&lt;/div&gt;&lt;div class="bar-wrap"&gt;&lt;div class="bar-fill" style="width:${pct}%"&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('gen-stats').innerHTML = genHtml;</p>
+<p class="p1">});</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
